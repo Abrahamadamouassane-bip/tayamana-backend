@@ -1,12 +1,11 @@
 // server.js
 require('dotenv').config();
 
-// Log de débogage pour voir les variables
-console.log('🔍 Variables DB détectées :');
-console.log('DB_HOST:', process.env.DB_HOST);
-console.log('DB_PORT:', process.env.DB_PORT);
-console.log('DB_USER:', process.env.DB_USER);
-console.log('DB_NAME:', process.env.DB_NAME);
+console.log('🔍 Variables détectées :');
+console.log('MYSQLHOST:', process.env.MYSQLHOST);
+console.log('MYSQLPORT:', process.env.MYSQLPORT);
+console.log('MYSQLUSER:', process.env.MYSQLUSER);
+console.log('MYSQLDATABASE:', process.env.MYSQLDATABASE);
 
 const app                = require('./app');
 const { testConnection } = require('./config/database');
