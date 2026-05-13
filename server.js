@@ -1,6 +1,14 @@
 // server.js
 require('dotenv').config();
-const app            = require('./app');
+
+// Log de débogage pour voir les variables
+console.log('🔍 Variables DB détectées :');
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_PORT:', process.env.DB_PORT);
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_NAME:', process.env.DB_NAME);
+
+const app                = require('./app');
 const { testConnection } = require('./config/database');
 
 const PORT = process.env.PORT || 3000;
