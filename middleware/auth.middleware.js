@@ -1,6 +1,8 @@
 // middleware/auth.middleware.js
 const jwt = require('jsonwebtoken');
 
+const JWT_SECRET = 'TayamanaSecretKey2024SuperSecure123!';
+
 const authenticate = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token      = authHeader && authHeader.split(' ')[1];
@@ -13,7 +15,7 @@ const authenticate = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user      = decoded;
     next();
   } catch (err) {
