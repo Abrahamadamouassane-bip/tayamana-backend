@@ -4,25 +4,28 @@ const jwt    = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const { pool } = require('../config/database');
 
-// ── Helpers ───────────────────────────────────────────────
+const JWT_SECRET          = 'TayamanaSecretKey2024SuperSecure123!';
+const JWT_EXPIRES_IN      = '7d';
+const JWT_REFRESH_EXPIRES = '30d';
+const BCRYPT_ROUNDS       = 12;
+
 const generateToken = (user) =>
   jwt.sign(
     { id: user.id, role: user.role, name: user.full_name },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN }
   );
 
 const generateRefreshToken = (userId) =>
   jwt.sign(
     { id: userId },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d' }
+    JWT_SECRET,
+    { expiresIn: JWT_REFRESH_EXPIRES }
   );
 
 const sendErrors = (res, errors) =>
   res.status(422).json({ success: false, errors: errors.array() });
 
-// ── 1. Valider le code unique ─────────────────────────────
 exports.validateCode = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return sendErrors(res, errors);
@@ -62,7 +65,6 @@ exports.validateCode = async (req, res) => {
   }
 };
 
-// ── 2. Créer le mot de passe ──────────────────────────────
 exports.createPassword = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return sendErrors(res, errors);
@@ -88,10 +90,7 @@ exports.createPassword = async (req, res) => {
     }
 
     const user         = rows[0];
-    const hashedPw     = await bcrypt.hash(
-      password,
-      parseInt(process.env.BCRYPT_ROUNDS) || 12
-    );
+    const hashedPw     = await bcrypt.hash(password, BCRYPT_ROUNDS);
     const token        = generateToken(user);
     const refreshToken = generateRefreshToken(user.id);
 
@@ -126,7 +125,6 @@ exports.createPassword = async (req, res) => {
   }
 };
 
-// ── 3. Connexion ──────────────────────────────────────────
 exports.login = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return sendErrors(res, errors);
@@ -196,7 +194,6 @@ exports.login = async (req, res) => {
   }
 };
 
-// ── 4. Refresh token ──────────────────────────────────────
 exports.refreshToken = async (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken) {
@@ -207,7 +204,7 @@ exports.refreshToken = async (req, res) => {
   }
 
   try {
-    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const decoded = jwt.verify(refreshToken, JWT_SECRET);
     const [rows]  = await pool.query(
       `SELECT id, full_name, role
        FROM users
@@ -232,7 +229,6 @@ exports.refreshToken = async (req, res) => {
   }
 };
 
-// ── 5. Déconnexion ────────────────────────────────────────
 exports.logout = async (req, res) => {
   try {
     await pool.query(
