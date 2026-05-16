@@ -11,6 +11,8 @@ const parentRoutes  = require('./routes/parent.routes');
 const studentRoutes = require('./routes/student.routes');
 
 const app = express();
+// ── Confiance au proxy Railway ─────────────────────────────
+app.set('trust proxy', 1);
 
 // ── Sécurité ──────────────────────────────────────────────
 app.use(helmet());
